@@ -74,7 +74,12 @@ extern "C"
             return nullptr;
         if (size > 16777216)
             return nullptr;
+
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_DFT_PLAN_F32*>(new kfr::dft_plan<float>(cpu_t::runtime, size));
+#else
+		return reinterpret_cast<KFR_DFT_PLAN_F32*>(new kfr::dft_plan<float>(size));
+#endif
     }
     KFR_DFT_PLAN_F64* kfr_dft_create_plan_f64(size_t size)
     {
@@ -82,7 +87,12 @@ extern "C"
             return nullptr;
         if (size > 16777216)
             return nullptr;
+
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_DFT_PLAN_F64*>(new kfr::dft_plan<double>(cpu_t::runtime, size));
+#else
+		return reinterpret_cast<KFR_DFT_PLAN_F64*>(new kfr::dft_plan<double>(size));
+#endif
     }
 
     void kfr_dft_dump_f32(KFR_DFT_PLAN_F32* plan) { reinterpret_cast<kfr::dft_plan<float>*>(plan)->dump(); }
@@ -148,8 +158,13 @@ extern "C"
             return nullptr;
         if (size > 16777216)
             return nullptr;
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_DFT_REAL_PLAN_F32*>(
             new kfr::dft_plan_real<float>(cpu_t::runtime, size, static_cast<dft_pack_format>(pack_format)));
+#else
+		return reinterpret_cast<KFR_DFT_REAL_PLAN_F32*>(
+			new kfr::dft_plan_real<float>(size, static_cast<dft_pack_format>(pack_format)));
+#endif
     }
     KFR_DFT_REAL_PLAN_F64* kfr_dft_real_create_plan_f64(size_t size, KFR_DFT_PACK_FORMAT pack_format)
     {
@@ -157,8 +172,13 @@ extern "C"
             return nullptr;
         if (size > 16777216)
             return nullptr;
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_DFT_REAL_PLAN_F64*>(
             new kfr::dft_plan_real<double>(cpu_t::runtime, size, static_cast<dft_pack_format>(pack_format)));
+#else
+		return reinterpret_cast<KFR_DFT_REAL_PLAN_F64*>(
+			new kfr::dft_plan_real<double>(size, static_cast<dft_pack_format>(pack_format)));
+#endif
     }
 
     void kfr_dft_real_dump_f32(KFR_DFT_REAL_PLAN_F32* plan)
@@ -228,7 +248,11 @@ extern "C"
             return nullptr;
         if (size > 16777216)
             return nullptr;
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_DCT_PLAN_F32*>(new kfr::dct_plan<float>(cpu_t::runtime, size));
+#else
+		return reinterpret_cast<KFR_DCT_PLAN_F32*>(new kfr::dct_plan<float>(size));
+#endif
     }
     KFR_DCT_PLAN_F64* kfr_dct_create_plan_f64(size_t size)
     {
@@ -236,7 +260,11 @@ extern "C"
             return nullptr;
         if (size > 16777216)
             return nullptr;
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_DCT_PLAN_F64*>(new kfr::dct_plan<double>(cpu_t::runtime, size));
+#else
+		return reinterpret_cast<KFR_DCT_PLAN_F64*>(new kfr::dct_plan<double>(size));
+#endif
     }
 
     void kfr_dct_dump_f32(KFR_DCT_PLAN_F32* plan) { reinterpret_cast<kfr::dct_plan<float>*>(plan)->dump(); }
@@ -290,41 +318,71 @@ extern "C"
 
     KFR_FILTER_F32* kfr_filter_create_fir_plan_f32(const kfr_f32* taps, size_t size)
     {
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_FILTER_F32*>(
             make_fir_filter<float>(cpu_t::runtime, make_univector(taps, size)));
+#else
+		return reinterpret_cast<KFR_FILTER_F32*>(
+			make_fir_filter<float>(make_univector(taps, size)));
+#endif
     }
     KFR_FILTER_F64* kfr_filter_create_fir_plan_f64(const kfr_f64* taps, size_t size)
     {
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_FILTER_F64*>(
             make_fir_filter<double>(cpu_t::runtime, make_univector(taps, size)));
+#else
+		return reinterpret_cast<KFR_FILTER_F64*>(
+			make_fir_filter<double>(make_univector(taps, size)));
+#endif
     }
 
     KFR_FILTER_F32* kfr_filter_create_convolution_plan_f32(const kfr_f32* taps, size_t size,
                                                            size_t block_size)
     {
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_FILTER_F32*>(make_convolve_filter<float>(
             cpu_t::runtime, make_univector(taps, size), block_size ? block_size : 1024));
-    }
+#else
+		return reinterpret_cast<KFR_FILTER_F32*>(make_convolve_filter<float>(
+			make_univector(taps, size), block_size ? block_size : 1024));
+#endif
+	}
     KFR_FILTER_F64* kfr_filter_create_convolution_plan_f64(const kfr_f64* taps, size_t size,
                                                            size_t block_size)
     {
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_FILTER_F64*>(make_convolve_filter<double>(
             cpu_t::runtime, make_univector(taps, size), block_size ? block_size : 1024));
+#else
+		return reinterpret_cast<KFR_FILTER_F64*>(make_convolve_filter<double>(
+			make_univector(taps, size), block_size ? block_size : 1024));
+#endif
     }
 
     KFR_FILTER_F32* kfr_filter_create_iir_plan_f32(const kfr_f32* sos, size_t sos_count)
     {
         if (sos_count < 1 || sos_count > 64)
             return nullptr;
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_FILTER_F32*>(make_biquad_filter<float, 64>(
             cpu_t::runtime, reinterpret_cast<const biquad_params<float>*>(sos), sos_count));
+#else
+		return reinterpret_cast<KFR_FILTER_F32*>(make_biquad_filter<float, 64>(
+			reinterpret_cast<const biquad_params<float>*>(sos), sos_count));
+#endif
     }
     KFR_FILTER_F64* kfr_filter_create_iir_plan_f64(const kfr_f64* sos, size_t sos_count)
     {
         if (sos_count < 1 || sos_count > 64)
             return nullptr;
+#if CMT_MULTI==1
         return reinterpret_cast<KFR_FILTER_F64*>(make_biquad_filter<double, 64>(
             cpu_t::runtime, reinterpret_cast<const biquad_params<double>*>(sos), sos_count));
+#else
+		return reinterpret_cast<KFR_FILTER_F64*>(make_biquad_filter<double, 64>(
+			reinterpret_cast<const biquad_params<double>*>(sos), sos_count));
+#endif
     }
 
     void kfr_filter_process_f32(KFR_FILTER_F32* plan, kfr_f32* output, const kfr_f32* input, size_t size)
