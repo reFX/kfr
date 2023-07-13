@@ -2,7 +2,7 @@
  *  @{
  */
 /*
-  Copyright (C) 2016-2022 Fractalium Ltd (https://www.kfrlib.com)
+  Copyright (C) 2016-2023 Dan Cazarin (https://www.kfrlib.com)
   This file is part of KFR
 
   KFR is free software: you can redistribute it and/or modify
@@ -290,19 +290,19 @@ extern "C"
 
     void kfr_dct_execute_f32(KFR_DCT_PLAN_F32* plan, float* out, const float* in, uint8_t* temp)
     {
-        reinterpret_cast<kfr::dct_plan<float>*>(plan)->execute(out, in, temp);
+        reinterpret_cast<kfr::dct_plan<float>*>(plan)->execute(out, in, temp, kfr::cfalse);
     }
     void kfr_dct_execute_f64(KFR_DCT_PLAN_F64* plan, double* out, const double* in, uint8_t* temp)
     {
-        reinterpret_cast<kfr::dct_plan<double>*>(plan)->execute(out, in, temp);
+        reinterpret_cast<kfr::dct_plan<double>*>(plan)->execute(out, in, temp, kfr::cfalse);
     }
     void kfr_dct_execute_inverse_f32(KFR_DCT_PLAN_F32* plan, float* out, const float* in, uint8_t* temp)
     {
-        reinterpret_cast<kfr::dct_plan<float>*>(plan)->execute(out, in, temp);
+        reinterpret_cast<kfr::dct_plan<float>*>(plan)->execute(out, in, temp, kfr::ctrue);
     }
     void kfr_dct_execute_inverse_f64(KFR_DCT_PLAN_F64* plan, double* out, const double* in, uint8_t* temp)
     {
-        reinterpret_cast<kfr::dct_plan<double>*>(plan)->execute(out, in, temp);
+        reinterpret_cast<kfr::dct_plan<double>*>(plan)->execute(out, in, temp, kfr::ctrue);
     }
 
     void kfr_dct_delete_plan_f32(KFR_DCT_PLAN_F32* plan)

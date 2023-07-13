@@ -2,7 +2,7 @@
  *  @{
  */
 /*
-  Copyright (C) 2016-2022 Fractalium Ltd (https://www.kfrlib.com)
+  Copyright (C) 2016-2023 Dan Cazarin (https://www.kfrlib.com)
   This file is part of KFR
 
   KFR is free software: you can redistribute it and/or modify
@@ -33,6 +33,9 @@ CMT_PRAGMA_GNU(GCC diagnostic ignored "-Wshadow")
 #endif
 #if CMT_HAS_WARNING("-Wunused-lambda-capture")
 CMT_PRAGMA_GNU(GCC diagnostic ignored "-Wunused-lambda-capture")
+#endif
+#if CMT_HAS_WARNING("-Wpass-failed")
+CMT_PRAGMA_GNU(GCC diagnostic ignored "-Wpass-failed")
 #endif
 
 CMT_PRAGMA_MSVC(warning(push))
@@ -1003,7 +1006,7 @@ to_fmt(size_t real_size, const complex<T>* rtwiddle, complex<T>* out, const comp
 
     constexpr size_t width = vector_width<T> * 2;
     const cvec<T, 1> dc    = cread<1>(out);
-    const size_t count     = csize / 2;
+    const size_t count     = (csize + 1) / 2;
 
     block_process(count - 1, csizes_t<width, 1>(),
                   [&](size_t i, auto w)
@@ -1022,6 +1025,7 @@ to_fmt(size_t real_size, const complex<T>* rtwiddle, complex<T>* out, const comp
                       cwrite<width>(out + csize - i - widthm1, reverse<2>(negodd(T(0.5) * (f1k - t))));
                   });
 
+    if (is_even(csize))
     {
         size_t k              = csize / 2;
         const cvec<T, 1> fpk  = cread<1>(in + k);
@@ -1068,7 +1072,7 @@ void from_fmt(size_t real_size, complex<T>* rtwiddle, complex<T>* out, const com
     }
 
     constexpr size_t width = vector_width<T> * 2;
-    const size_t count     = csize / 2;
+    const size_t count     = (csize + 1) / 2;
 
     block_process(count - 1, csizes_t<width, 1>(),
                   [&](size_t i, auto w)
@@ -1080,13 +1084,13 @@ void from_fmt(size_t real_size, complex<T>* rtwiddle, complex<T>* out, const com
                       const cvec<T, width> fpk  = cread<width>(in + i);
                       const cvec<T, width> fpnk = reverse<2>(negodd(cread<width>(in + csize - i - widthm1)));
 
-                      const cvec<T, width> f1k = fpk + fpnk;
-                      const cvec<T, width> f2k = fpk - fpnk;
-                      const cvec<T, width> t   = cmul_conj(f2k, tw);
-                      cwrite<width>(out + i, f1k + t);
-                      cwrite<width>(out + csize - i - widthm1, reverse<2>(negodd(f1k - t)));
-                  });
-
+        const cvec<T, width> f1k = fpk + fpnk;
+        const cvec<T, width> f2k = fpk - fpnk;
+        const cvec<T, width> t   = cmul_conj(f2k, tw);
+        cwrite<width>(out + i, f1k + t);
+        cwrite<width>(out + csize - i - widthm1, reverse<2>(negodd(f1k - t)));
+    });
+    if (is_even(csize))
     {
         size_t k              = csize / 2;
         const cvec<T, 1> fpk  = cread<1>(in + k);
@@ -1132,7 +1136,8 @@ public:
     {
         this->user       = static_cast<int>(fmt);
         this->stage_size = real_size;
-        this->data_size  = align_up(sizeof(complex<T>) * (real_size / 4), platform<>::native_cache_alignment);
+        const size_t count = (real_size / 2 + 1) / 2;
+        this->data_size  = align_up(sizeof(complex<T>) * count, platform<>::native_cache_alignment);
     }
     void do_initialize(size_t) override
     {
@@ -1140,14 +1145,15 @@ public:
         constexpr size_t width = vector_width<T> * 2;
         size_t real_size       = this->stage_size;
         complex<T>* rtwiddle   = ptr_cast<complex<T>>(this->data);
-        block_process(real_size / 4, csizes_t<width, 1>(),
+        const size_t count = (real_size / 2 + 1) / 2;
+        block_process(count, csizes_t<width, 1>(),
                       [=](size_t i, auto w)
                       {
                           constexpr size_t width = val_of(decltype(w)());
                           cwrite<width>(
                               rtwiddle + i,
                               cossin(dup(-constants<T>::pi *
-                                         ((enumerate<T, width>() + i + real_size / 4) / (real_size / 2)))));
+                                         ((enumerate<T, width>() + i + real_size / T(4)) / (real_size / 2)))));
                       });
     }
     void do_execute(cdirect_t, complex<T>* out, const complex<T>* in, u8* temp) override

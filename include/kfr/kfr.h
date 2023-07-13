@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2016-2022 Fractalium Ltd (https://www.kfrlib.com)
+  Copyright (C) 2016-2023 Dan Cazarin (https://www.kfrlib.com)
   This file is part of KFR
 
   KFR is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 
 #define KFR_VERSION_MAJOR 5
 #define KFR_VERSION_MINOR 0
-#define KFR_VERSION_PATCH 2
+#define KFR_VERSION_PATCH 3
 #define KFR_VERSION_LABEL ""
 
 #define KFR_VERSION_STRING                                                                                   \

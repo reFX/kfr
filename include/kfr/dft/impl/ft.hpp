@@ -2,7 +2,7 @@
  *  @{
  */
 /*
-  Copyright (C) 2016-2022 Fractalium Ltd (https://www.kfrlib.com)
+  Copyright (C) 2016-2023 Dan Cazarin (https://www.kfrlib.com)
   This file is part of KFR
 
   KFR is free software: you can redistribute it and/or modify
@@ -36,6 +36,12 @@
 
 #include "../../base/memory.hpp"
 #include "../data/sincos.hpp"
+
+
+CMT_PRAGMA_GNU(GCC diagnostic push)
+#if CMT_HAS_WARNING("-Wpass-failed")
+CMT_PRAGMA_GNU(GCC diagnostic ignored "-Wpass-failed")
+#endif
 
 CMT_PRAGMA_MSVC(warning(push))
 CMT_PRAGMA_MSVC(warning(disable : 4127))
@@ -1812,3 +1818,5 @@ KFR_INTRINSIC void cdigitreverse4_write<false, f64, 32>(complex<f64>* dest, cons
 } // namespace kfr
 
 CMT_PRAGMA_MSVC(warning(pop))
+
+CMT_PRAGMA_GNU(GCC diagnostic pop)
